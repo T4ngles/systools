@@ -11,29 +11,28 @@ import glob
 
 def main():
     print(sys.argv[0])
-    walk_dir = os.path.dirname(sys.argv[0])
-    #walk_dir = walk_dir[0:walk_dir.find(walk_dir.split('/')[-1])]
-    raywalk(walk_dir)
+    walk_dir = os.path.dirname(sys.argv[0]) #walk_dir = walk_dir[0:walk_dir.find(walk_dir.split('/')[-1])]
+    for file in raywalk(walk_dir):
+        pass #to yield all files in main()
     #walk(walk_dir)
     #globber(walk_dir)
 
 
 def raywalk(walk_dir):
     print("#"*20)    
-    print("raywalk")    
+    print("raywalk")
+    walkedfiles = []
 
-    for root, subFolders, files in os.walk(walk_dir):
-
+    for roots, folders, files in os.walk(walk_dir):
+        folder=''
         for file in files:
+            if folder != os.path.split(roots)[1]:
+                folder = os.path.split(roots)[1]
+                spacer = 20-len(folder)
+                print("="*5 + folder + "="*spacer)
             print("- " + file)
-                
-        for folder in subFolders:
-            spacer = 20-len(folder)
-            print("="*5 + folder + "="*spacer)
-
-            for file in files:
-                print("- " + file)
-
+            yield os.path.join(roots, file)
+            
 def globber(walk_dir):    
     print("#"*20)  
     print("globber")
@@ -41,7 +40,7 @@ def globber(walk_dir):
     for filename in glob.glob(walk_dir + '**/*.txt', recursive=True):
         print(filename)
 
-def walk(walk_dir):
+def stack_exchange_walk(walk_dir):
     print("#"*20)
     print("walk")
     
