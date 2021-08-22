@@ -1,9 +1,20 @@
 """
-    File hasher for integrity check
+    System health check
     to add:
-        -recursive loop for all directories and files below target
-        -store of hash result in dictionary
-        -encryption of hash result
+        File Backup
+        System component health check
+        System Internal traffic monitor
+        System External traffic monitor
+        File integrity (Start up and Shutdown scheduled check)
+            -recursive loop for all directories and files below target
+            -store of hash result in dictionary
+            -encryption of hash result
+            -export of file hash dictionary
+            -encryption of dictionary
+            -decryption of dictionary
+            -length comparison of dictionary to current files
+                -list new files and hashes
+            -comparison of dictionary to current files
 """
 
 import hashlib
