@@ -1,14 +1,13 @@
 """
     File hasher for integrity check
     to add:
-        -recursive loop for all directories and files below target
-        -store of hash result in dictionary
-        -encryption of hash result
+        -different hasing methods
+        -lower level file data access
 """
 
 import hashlib
+import sys
 import os
-import glob
 
 def str_hasher(filepath):    
     with open(filepath) as f:
@@ -20,7 +19,7 @@ def str_hasher(filepath):
 def general_hasher(filepath):
     return hashlib.md5(open(filepath,'rb').read()).hexdigest()    
 
-if __name__ == '__main__':
+def file_hasher():
     filepath = input("filepath:")
     filename = filepath.split(sep='\\')[-1]
     print('='*len(filename))
@@ -30,6 +29,14 @@ if __name__ == '__main__':
         print('string hash:',str_hasher(filepath))
     except UnicodeDecodeError:
         print('general hash:',general_hasher(filepath))
+
+def main():
+    
+    file_hasher()
+    
+if __name__ == '__main__':
+    main()
+    
 
 #C:\Users\rlau0\Downloads\stegano1.bmp
 #C:\Users\rlau0\Downloads\Mr.Robot.S04E04.iNTERNAL.480p.x264-mSD[eztv].mkv
