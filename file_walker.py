@@ -18,9 +18,18 @@ def main():
     #globber(walk_dir)
 
 
-def raywalk(walk_dir):
-    print("#"*20)    
-    print("raywalk")
+def raywalk(walk_dir,verbose):
+    verbose = verbose
+    if verbose:
+        def vprint(*args):
+            for arg in args:
+                print(arg)
+    else:
+        def vprint(*args):
+            pass
+        
+    vprint("#"*20)    
+    vprint("raywalk")
     walkedfiles = []
 
     for roots, folders, files in os.walk(walk_dir):
@@ -29,8 +38,8 @@ def raywalk(walk_dir):
             if folder != os.path.split(roots)[1]:
                 folder = os.path.split(roots)[1]
                 spacer = 20-len(folder)
-                print("="*5 + folder + "="*spacer)
-            print("- " + file)
+                vprint("="*5 + folder + "="*spacer)
+            vprint("- " + file)
             yield os.path.join(roots, file)
             
 def globber(walk_dir):    
