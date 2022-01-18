@@ -78,7 +78,7 @@ def main():
 
     endwrite_time = datetime.datetime.now()
     
-    spacing = [vprint("") for x in range(5)]
+    spacing = [print("") for x in range(5)]
     
     print("file integrity check started at", str(start_date))
     print("file walk took " + str((endwalk_time-startwalk_time).total_seconds()) + " seconds")
