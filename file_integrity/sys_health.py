@@ -9,11 +9,8 @@
             -include progress bar of walk through files
             -improve walk speed
             -encryption of dictionary
-            -decryption of dictionary
-            -loading previous stored dictionary and comparison during hash flagging whether hash is same or not using name as key
+            -decryption of dictionary            
             -length comparison of dictionary to current files
-                -list new files and hashes
-            -comparison of dictionary to current files
             -export file change summary
             -visualisation of changes
 """
@@ -26,22 +23,15 @@ import file_hasher
 import csv
 import datetime
 import time
-
-def debug_block_heading(title):
-    title_length = len(title)
-    block_size = 50
-    spacer = "="*int((block_size-title_length)/2-1)
-    spacer_length = len(spacer)+1
-    leftover = block_size-2*spacer_length-title_length
-    vprint("="*block_size)
-    vprint(spacer,title,spacer,"="*leftover)
-    vprint("="*block_size)
+import glob
 
 def main():
     
     start_date = datetime.datetime.now()
+    print("#"*200)
+    print("File integrity check started at", str(start_date))
     
-    verbose = False
+    verbose = True
 
     if verbose:
         def vprint(*args):
@@ -50,39 +40,96 @@ def main():
     else:
         def vprint(*args):
             pass
-        
-    file_hash_dict_list = []
-    
-    walk_dir = os.path.splitdrive(sys.argv[0])[0] + "\\"#C drive #os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(sys.argv[0])))) #Documents folder #os.path.dirname(sys.argv[0]) #file_integrity folder
+
+    def debug_block_heading(title):
+        title_length = len(title)
+        block_size = 100
+        spacer = "="*int((block_size-title_length)/2)
+        spacer_length = len(spacer)+1
+        leftover = block_size-2*spacer_length-title_length
+        vprint("")
+        vprint("="*block_size)
+        vprint(spacer+title+spacer+"="*leftover)
+        vprint("="*block_size)
+        vprint("")
+
+    def print_space():
+        spacing = [print("") for x in range(2)]
+
+    #os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(sys.argv[0])))) #Documents folder #os.path.dirname(sys.argv[0]) #file_integrity folder
+    #walk_dir = os.path.dirname(sys.argv[0]) #file_integrity folder
+    walk_dir = os.path.splitdrive(sys.argv[0])[0] + "\\"#C drive 
     debug_block_heading("File Integrity Check of " + walk_dir)
     startwalk_time = datetime.datetime.now()
-    
+
+    #walk through files and compute hashes and add to dictionary of hashes
+    file_hash_dict_dict = {} 
     for x,filepath in enumerate(file_walker.oswalk(walk_dir,verbose)):
         #todo: add progress bar using enumerate somehow
         file_hash = file_hasher.sha512_hasher(filepath) #calculate hash of file
         filename = os.path.basename(filepath) #get filename
-        file_hash_dict = {"hash":file_hash,"filename":filename,"filepath":filepath,"hashcompare":True} #create dictionary of file hash details todo add check to hashcompare
-        file_hash_dict_list.append(file_hash_dict) #append to list of dictionaries
-        vprint(file_hash)
+        file_hash_dict = {"hash":file_hash,"filename":filename,"filepath":filepath,"hashfound":False} #create dictionary of file hash details 
+        file_hash_dict_dict[file_hash] = file_hash_dict      
 
     endwalk_time = datetime.datetime.now()
+
+    print_space()
+    print("file walk of " + str(len(file_hash_dict_dict)) + " files took " + str((endwalk_time-startwalk_time).total_seconds()) + " seconds")
+
+    #get latest log file
+    logs_path = os.path.dirname(sys.argv[0]) + "\\logs\\"
+    file_type = r'\*csv'
+    files = glob.glob(logs_path + file_type)
+    latest_log = max(files, key=os.path.getctime)
     
-    with open(str(datetime.date.today())+' - '+os.path.basename(walk_dir)+' - file_hash_dict.csv', 'w', encoding='utf-8', newline='') as csvfile:
-        fieldnames = ["hash", "filename", "filepath"]
+    print_space()
+    print("latest log found at " + latest_log)
+
+    fieldnames = ["hash", "filename", "filepath", "hashfound"]
+
+    #open old hashlist csv and check current hashes with hashes in csv
+    old_hash_dict = {}
+    new_files = {}
+
+    with open(latest_log, 'r', encoding='utf-8', newline='') as readcsvfile:
+        reader = csv.DictReader(readcsvfile)
+        for item in reader:
+            old_hash_dict[item["hash"]] = item
+
+    #compare new hashlist to old and write out new hash summary log
+    log_name = logs_path + str(datetime.datetime.now().strftime("%d-%m-%Y %H%M%S"))+' - '+os.path.basename(walk_dir)+' - file_hash_dict.csv'     
+    
+    with open(log_name, 'w', encoding='utf-8', newline='') as csvfile:
+        
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         debug_block_heading("Hash table")
-        for item in file_hash_dict_list:
-            writer.writerow(item)
-            vprint(item["hash"],item["filename"])
+
+        for file_hash in file_hash_dict_dict.values():
+            if file_hash["hash"] in old_hash_dict:
+                file_hash["hashfound"] = True
+            else:
+                file_hash["hashfound"] = False
+                new_files[file_hash["hash"]] = file_hash
+
+            writer.writerow(file_hash)
+            vprint(file_hash["hash"] + "    " + file_hash["filename"])
 
     endwrite_time = datetime.datetime.now()
     
-    spacing = [print("") for x in range(5)]
+    print_space()
     
-    print("file integrity check started at", str(start_date))
-    print("file walk took " + str((endwalk_time-startwalk_time).total_seconds()) + " seconds")
-    print("file write took " + str((endwrite_time-endwalk_time).total_seconds()) + " seconds")
+    print("log comparison and write took " + str((endwrite_time-endwalk_time).total_seconds()) + " seconds")
+    print("log file saved at " + log_name)
+
+    print_space()
+
+    if new_files:
+        print("new files or modifications found for the following files:")
+        for item in new_files.values():
+            print(item["filename"])
+    else:
+        print("no new files or modifications found")
 
             
 if __name__ == '__main__':
