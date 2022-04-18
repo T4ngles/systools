@@ -127,7 +127,7 @@ def main():
     if new_files:
         print("new files or modifications found for the following files:")
         for item in new_files.values():
-            print(item["filename"])
+            print(item["filename"] + "    " + item["filepath"])
     else:
         print("no new files or modifications found")
 
