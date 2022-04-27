@@ -124,13 +124,6 @@ def main():
             vprint(file_hash["hash"] + "    " + file_hash["filename"])
 
     endwrite_time = datetime.datetime.now()
-    
-    print_space()
-    
-    print("log comparison and write took " + str((endwrite_time-endwalk_time).total_seconds()) + " seconds")
-    print("log file saved at " + log_name)
-
-    print_space()
 
     if new_files:
         print("new files or modifications found for the following files:")
@@ -138,6 +131,16 @@ def main():
             print(item["filename"] + "    " + item["filepath"])
     else:
         print("no new files or modifications found")
+    
+    print_space()
+
+    print("file walk of " + str(len(file_hash_dict_dict)) + " files took " + str((endwalk_time-startwalk_time).total_seconds()) + " seconds")
+    print("log comparison and write took " + str((endwrite_time-endwalk_time).total_seconds()) + " seconds")
+    print("log file saved at " + log_name)
+
+    print_space()
+
+    
 
             
 if __name__ == '__main__':
