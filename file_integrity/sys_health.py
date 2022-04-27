@@ -31,7 +31,7 @@ def main():
     print("#"*200)
     print("File integrity check started at", str(start_date))
     
-    verbose = True
+    verbose = False
 
     if verbose:
         def vprint(*args):
@@ -59,7 +59,8 @@ def main():
     #os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(sys.argv[0])))) #Documents folder #os.path.dirname(sys.argv[0]) #file_integrity folder
     #walk_dir = os.path.dirname(sys.argv[0]) #file_integrity folder
     walk_dir = os.path.splitdrive(sys.argv[0])[0] + "\\"#C drive 
-    debug_block_heading("File Integrity Check of " + walk_dir)
+    walk_dir = "c:\\"
+    print("File Integrity Check of " + walk_dir)
     startwalk_time = datetime.datetime.now()
 
     #walk through files and compute hashes and add to dictionary of hashes
@@ -80,21 +81,26 @@ def main():
     logs_path = os.path.dirname(sys.argv[0]) + "\\logs\\"
     file_type = r'\*csv'
     files = glob.glob(logs_path + file_type)
-    latest_log = max(files, key=os.path.getctime)
-    
-    print_space()
-    print("latest log found at " + latest_log)
+    latest_log = ""
+    try:
+        latest_log = max(files, key=os.path.getctime)
+        print_space()
+        print("latest log found at " + latest_log)
+    except ValueError:
+        print("No Logs found. Creating log")
+        os.mkdir(logs_path)    
 
     fieldnames = ["hash", "filename", "filepath", "hashfound"]
 
-    #open old hashlist csv and check current hashes with hashes in csv
-    old_hash_dict = {}
-    new_files = {}
+    if latest_log != "":
+        #open old hashlist csv and check current hashes with hashes in csv
+        old_hash_dict = {}
+        new_files = {}
 
-    with open(latest_log, 'r', encoding='utf-8', newline='') as readcsvfile:
-        reader = csv.DictReader(readcsvfile)
-        for item in reader:
-            old_hash_dict[item["hash"]] = item
+        with open(latest_log, 'r', encoding='utf-8', newline='') as readcsvfile:
+            reader = csv.DictReader(readcsvfile)
+            for item in reader:
+                old_hash_dict[item["hash"]] = item
 
     #compare new hashlist to old and write out new hash summary log
     log_name = logs_path + str(datetime.datetime.now().strftime("%d-%m-%Y %H%M%S"))+' - '+os.path.basename(walk_dir)+' - file_hash_dict.csv'     
@@ -106,11 +112,13 @@ def main():
         debug_block_heading("Hash table")
 
         for file_hash in file_hash_dict_dict.values():
-            if file_hash["hash"] in old_hash_dict:
-                file_hash["hashfound"] = True
-            else:
-                file_hash["hashfound"] = False
-                new_files[file_hash["hash"]] = file_hash
+
+            if latest_log != "":
+                if file_hash["hash"] in old_hash_dict:
+                    file_hash["hashfound"] = True
+                else:
+                    file_hash["hashfound"] = False
+                    new_files[file_hash["hash"]] = file_hash
 
             writer.writerow(file_hash)
             vprint(file_hash["hash"] + "    " + file_hash["filename"])
