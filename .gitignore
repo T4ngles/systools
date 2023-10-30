@@ -2,3 +2,4 @@
 __pycache__/file_walker.cpython-38.pyc
 *.pyc
 *.csv
+*.vbs
