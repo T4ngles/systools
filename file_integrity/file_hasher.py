@@ -20,26 +20,57 @@ def sha256_hasher(filepath):
     return hashlib.sha256(open(filepath,'rb').read()).hexdigest()
 
 def sha512_hasher(filepath):
-    try:
-        hash = hashlib.sha512(open(filepath,'rb').read()).hexdigest()
-    except PermissionError:
-        hash = "Permission ERROR"
-    except OSError:
-        hash = "OS ERROR"
-    return hash
+    return hashlib.sha512(open(filepath,'rb').read()).hexdigest()
  
-def file_hash():
+def file_hash(filepath,hash_type):
+    try:
+        if hash_type == "md5":
+            hash_out = md5_hasher(filepath)
+        if hash_type == "sha256":
+            hash_out = sha256_hasher(filepath)
+        if hash_type == "sha512":
+            hash_out = sha512_hasher(filepath)            
+    except PermissionError:
+        hash_out = "Permission ERROR" + filepath
+    except OSError:
+        hash_out = "OS ERROR" + filepath
+    except MemoryError:
+        hash_out = "MemoryError" + filepath
+
+    filename = filepath.split(sep='\\')[-1]
+    print(filename,':',hash_out)
+    
+    return hash_out
+
+
+def user_file_hash(hash_type):
     filepath = input("filepath:").replace("\"","")
     print("filepath:",filepath)
     filename = filepath.split(sep='\\')[-1]
     print('='*len(filename))
     print(filename)
     print('='*len(filename))
-    print('sha512 hash:',sha512_hasher(filepath))
+
+    try:
+        if hash_type == "md5":
+            md5_hasher(filepath)
+        if hash_type == "sha256":
+            sha256_hasher(filepath)
+        if hash_type == "sha512":
+            sha512_hasher(filepath)            
+    except PermissionError:
+        hash_out = "Permission ERROR"
+    except OSError:
+        hash_out = "OS ERROR"
+    except MemoryError:
+        hash_out = "MemoryError"
+    return hash_out
+
+    print(hash_type,':',hash_out)
 
 def main():
     
-    file_hash()
+    user_file_hash("sha512")
     
 if __name__ == '__main__':
     main()

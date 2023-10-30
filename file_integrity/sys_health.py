@@ -60,17 +60,18 @@ def main():
     #walk_dir = os.path.dirname(sys.argv[0]) #file_integrity folder
     walk_dir = os.path.splitdrive(sys.argv[0])[0] + "\\"#C drive 
     walk_dir = "c:\\"
-    print("File Integrity Check of " + walk_dir)
+    hash_type = "sha512"
+    print(hash_type + " File Integrity Check of " + walk_dir)
     startwalk_time = datetime.datetime.now()
 
     #walk through files and compute hashes and add to dictionary of hashes
     file_hash_dict_dict = {} 
     for x,filepath in enumerate(file_walker.oswalk(walk_dir,verbose)):
         #todo: add progress bar using enumerate somehow
-        file_hash = file_hasher.sha512_hasher(filepath) #calculate hash of file
+        file_hash = file_hasher.file_hash(filepath,hash_type) #calculate hash of file
         filename = os.path.basename(filepath) #get filename
         file_hash_dict = {"hash":file_hash,"filename":filename,"filepath":filepath,"hashfound":False} #create dictionary of file hash details 
-        file_hash_dict_dict[file_hash] = file_hash_dict      
+        file_hash_dict_dict[file_hash] = file_hash_dict
 
     endwalk_time = datetime.datetime.now()
 
