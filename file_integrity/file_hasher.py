@@ -50,14 +50,10 @@ def user_file_hash(hash_type):
     print('='*len(filename))
     print(filename)
     print('='*len(filename))
+    hash_out = ""
 
     try:
-        if hash_type == "md5":
-            md5_hasher(filepath)
-        if hash_type == "sha256":
-            sha256_hasher(filepath)
-        if hash_type == "sha512":
-            sha512_hasher(filepath)            
+        hash_out = file_hash(filepath,hash_type)      
     except PermissionError:
         hash_out = "Permission ERROR"
     except OSError:
@@ -70,7 +66,7 @@ def user_file_hash(hash_type):
 
 def main():
     
-    user_file_hash("sha512")
+    user_file_hash("sha256")
     
 if __name__ == '__main__':
     main()
