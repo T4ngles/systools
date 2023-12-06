@@ -23,7 +23,7 @@ while int(datetime.datetime.now().strftime("%H")) < 18:
     
     if activity != str(GetWindowText(GetForegroundWindow())):
     	
-    	print(timestamp_old,"-", activity)
+    	print(timestamp_old,"-", timestamp_new, ":", activity)
     	timesheet_list.append((activity,timestamp_old,timestamp_new))
     	activity = str(GetWindowText(GetForegroundWindow()))
     	
