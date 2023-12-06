@@ -65,8 +65,19 @@ def user_file_hash(hash_type):
     print(hash_type,':',hash_out)
 
 def main():
-    
-    user_file_hash("sha256")
+
+    hash_choice = {
+        "1": "md5",
+        "2": "sha256",
+        "3": "sha512",
+    }
+
+    for k,v in hash_choice.items():
+        print(k, ":", v)
+
+    hash_type = hash_choice[input("choose hash type:")]
+
+    user_file_hash(hash_type)
     
 if __name__ == '__main__':
     main()
