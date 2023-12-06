@@ -42,8 +42,7 @@ while int(datetime.datetime.now().strftime("%H")) < 18:
     	print(timestamp_old,"-", timestamp_new, ":", activity)
     	timesheet_list.append((activity,timestamp_old,timestamp_new))
     	activity = str(GetWindowText(GetForegroundWindow()))
-    	
-    timestamp_old = datetime.datetime.now().strftime("%H:%M")
+    	timestamp_old = datetime.datetime.now().strftime("%H:%M")
     
     #await asyncio.sleep(10)
     #threading.Event().wait(10)
