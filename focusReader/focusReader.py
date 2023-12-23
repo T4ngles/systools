@@ -28,9 +28,12 @@ COMMON_WORDS = ""#"a you how use and to this about the of as well in will they a
 ERASE_LINE = '\x1b[2K'
 CURSOR_UP_ONE = '\x1b[1A'
 
-sleepTime = 0.18
+sleepTime = 0.12
 
 debug = False
+
+STREAM_READING = True
+
 
 #FUNCTIONS
 def splitWords(textInputStr: str):
@@ -60,8 +63,12 @@ def printDigest(digestWords: list):
         wordPadding = (padding-wordLength//2)*" "
         trailer = (maxLengthWordCharacters-len(wordPadding)-wordLength)*" "
 
-        print(f"{round(i/totalWords*100,0):.0f}% " + wordPadding + word + trailer, end="\r")
-        
+        if STREAM_READING:        
+            if i > 0 and i < totalWords-1:
+                print(f"{round(i/totalWords*100,0):.0f}% " + digestWords[i-1] +" "+ digestWords[i] +" "+ digestWords[i+1] +wordPadding, end="\r")
+        else:
+            print(f"{round(i/totalWords*100,0):.0f}% " + wordPadding + word + trailer, end="\r")
+            
         time.sleep(sleepTime+0.01*wordLength)
         #sys.stdout.write(CURSOR_UP_ONE)
         #sys.stdout.write(ERASE_LINE)
