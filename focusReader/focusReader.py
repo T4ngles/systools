@@ -16,18 +16,19 @@
 
 import time
 import sys
+import re
 
 #DEBUGGING
 
 debugText = "Previously, you learned how organizations use security frameworks and controls to protect against threats, risks, and vulnerabilities. This included discussions about the National Institute of Standards and Technology’s (NIST’s) Risk Management Framework (RMF) and Cybersecurity Framework (CSF), as well as the confidentiality, integrity, and availability (CIA) triad. In this reading, you will further explore security frameworks and controls and how they are used together to help mitigate organizational risk."
 
 #VARIABLES
-COMMON_WORDS = "you how use and to this about the of as well in will they are".split(" ")
+COMMON_WORDS = "a you how use and to this about the of as well in will they are".split(" ")
 
 ERASE_LINE = '\x1b[2K'
 CURSOR_UP_ONE = '\x1b[1A'
 
-sleepTime = 0.3
+sleepTime = 0.2
 
 debug = False
 
@@ -35,8 +36,8 @@ debug = False
 def splitWords(textInputStr: str):
     assert isinstance(textInputStr, str)
     
-    return textInputStr.split(" ")
-    
+    #return textInputStr.split(" ")
+    return re.split(" |\n", textInputStr)
 
 def removeCommon(textInputList: list, commonWords: list):
     assert isinstance(textInputList, list)
@@ -48,9 +49,12 @@ def removeCommon(textInputList: list, commonWords: list):
     return textInputList
 
 def printDigest(digestWords: list):
+    totalWords = len(digestWords)
+    maxLengthWord = max(digestWords, key=len)
+    maxLengthWordCharacters = len(maxLengthWord)
     
-    for word in digestWords:
-            print(word+100*" ", end="\r")
+    for i, word in enumerate(digestWords):
+            print(f"{round(i/totalWords*100,0):.0f}% " + word+maxLengthWordCharacters*" ", end="\r")
             time.sleep(sleepTime)
             #sys.stdout.write(CURSOR_UP_ONE)
             #sys.stdout.write(ERASE_LINE)
@@ -58,8 +62,18 @@ def printDigest(digestWords: list):
 #MAIN FUNCTION
 if __name__ == '__main__':
 
-    if debug: textInput = debugText
-    else: textInput = input("Please provide text to summarise:")
+    if debug:
+        textInput = debugText
+    else:
+        print("Please provide text to summarise, press ctrl+c when done")
+        textInput = ""
+        while True:
+            try:
+                line = input()
+            except KeyboardInterrupt:
+                print("\n"*30)
+                break
+            textInput = textInput + "\n" + line
     
     textInputList = splitWords(textInput)
 
