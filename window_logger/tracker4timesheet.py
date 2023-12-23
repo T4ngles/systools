@@ -7,6 +7,22 @@ import threading
 
 #async def track():
 
+#TODO: add in activity class and activity dictionary
+class Window_Task:
+    _tasks_dict = {}
+
+    def __init__(self, name, time_Spent=0):
+        self.name = name
+        time_Spent = time_Spent
+
+    def calc_Time_Spent(self):
+        pass
+
+    @classmethod
+    def time_Summary(cls):
+        for key, value in _tasks_dict.values():
+            print(key, value)
+
 timestamp_old = datetime.datetime.now().strftime("%m-%d %H:%M")
 activity = str(GetWindowText(GetForegroundWindow()))
 timesheet_list = [("Activity","starttime","endtime")]
@@ -23,11 +39,10 @@ while int(datetime.datetime.now().strftime("%H")) < 18:
     
     if activity != str(GetWindowText(GetForegroundWindow())):
     	
-    	print(timestamp_old,"-", activity)
+    	print(timestamp_old,"-", timestamp_new, ":", activity)
     	timesheet_list.append((activity,timestamp_old,timestamp_new))
     	activity = str(GetWindowText(GetForegroundWindow()))
-    	
-    timestamp_old = datetime.datetime.now().strftime("%H:%M")
+    	timestamp_old = datetime.datetime.now().strftime("%H:%M")
     
     #await asyncio.sleep(10)
     #threading.Event().wait(10)

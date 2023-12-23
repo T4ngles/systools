@@ -1,3 +1,23 @@
+"""
+    Basic Password Tester/Cipher/Encrypter GUI
+
+    To test strength of passwords using backend scripts and to generate and 
+    store passwords using personal keys. Demonstration of password strength,
+    ciphers, and encryption standards
+
+    [ ]amalgamate script files into one backend import script
+    [ ]create window with basic encrypt decrypt functions
+
+    Password Testing
+    [ ]basic password hygiene discrete tests
+    [ ]Replicate hashcat/JTR brute force code to test passwords
+
+    Password Storage and Encryption
+    [ ]import saved passwords on startup
+    [ ]export saved passwords on save button 
+    [ ]encrypt/decrypt password file using public/private key
+"""
+
 from tkinter import *
 
 DEBUG_MODE = False
