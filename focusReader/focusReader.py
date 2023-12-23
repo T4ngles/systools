@@ -23,12 +23,12 @@ import re
 debugText = "Previously, you learned how organizations use security frameworks and controls to protect against threats, risks, and vulnerabilities. This included discussions about the National Institute of Standards and Technology’s (NIST’s) Risk Management Framework (RMF) and Cybersecurity Framework (CSF), as well as the confidentiality, integrity, and availability (CIA) triad. In this reading, you will further explore security frameworks and controls and how they are used together to help mitigate organizational risk."
 
 #VARIABLES
-COMMON_WORDS = "a you how use and to this about the of as well in will they are".split(" ")
+COMMON_WORDS = ""#"a you how use and to this about the of as well in will they are".split(" ")
 
 ERASE_LINE = '\x1b[2K'
 CURSOR_UP_ONE = '\x1b[1A'
 
-sleepTime = 0.2
+sleepTime = 0.18
 
 debug = False
 
@@ -52,12 +52,19 @@ def printDigest(digestWords: list):
     totalWords = len(digestWords)
     maxLengthWord = max(digestWords, key=len)
     maxLengthWordCharacters = len(maxLengthWord)
+    padding = maxLengthWordCharacters//2
+
     
     for i, word in enumerate(digestWords):
-            print(f"{round(i/totalWords*100,0):.0f}% " + word+maxLengthWordCharacters*" ", end="\r")
-            time.sleep(sleepTime)
-            #sys.stdout.write(CURSOR_UP_ONE)
-            #sys.stdout.write(ERASE_LINE)
+        wordLength = len(word)
+        wordPadding = (padding-wordLength//2)*" "
+        trailer = (maxLengthWordCharacters-len(wordPadding)-wordLength)*" "
+
+        print(f"{round(i/totalWords*100,0):.0f}% " + wordPadding + word + trailer, end="\r")
+        
+        time.sleep(sleepTime+0.01*wordLength)
+        #sys.stdout.write(CURSOR_UP_ONE)
+        #sys.stdout.write(ERASE_LINE)
 
 #MAIN FUNCTION
 if __name__ == '__main__':
@@ -65,6 +72,8 @@ if __name__ == '__main__':
     if debug:
         textInput = debugText
     else:
+        print("Following common words will be removed.")
+        print(COMMON_WORDS)
         print("Please provide text to summarise, press ctrl+c when done")
         textInput = ""
         while True:
