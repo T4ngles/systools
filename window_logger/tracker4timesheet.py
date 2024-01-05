@@ -1,3 +1,18 @@
+"""
+    Window Logger
+
+        To log activity during work hours and summarise time spent on tasks for
+        billing time to projects.
+    
+    to add:
+        [ ]Inactivity check based on mouse cursor position
+        [ ]Grouping of tasks using regex matching and stored application name list       
+        [ ]Summary of tasks logged
+        [ ]visualisation of tasks logged for day
+        [ ]alerts based on time logged for task with long time
+           
+"""
+
 from win32gui import GetWindowText, GetForegroundWindow
 import datetime
 import time
