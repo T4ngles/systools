@@ -5,14 +5,19 @@
         System component health check
         System Internal traffic monitor
         System External traffic monitor
-        File integrity (Start up and Shutdown scheduled check)
-            -include progress bar of walk through files
-            -improve walk speed
-            -encryption of dictionary
-            -decryption of dictionary            
-            -length comparison of dictionary to current files
-            -export file change summary
-            -visualisation of changes
+        [X]File integrity (Start up and Shutdown scheduled check)
+            [ ]include progress bar of walk through files            
+            [ ]include comparison to malware hash database
+            [ ]read in most recent log for comparison
+            [ ]append to log with summary of file changes and additions
+            [ ]create a sqlite database to serve the file hashes
+            [ ]include Virus Total API for file hash inspection
+            [ ]include CYB3RMX MalwareHashDB for file md5 hash comparison
+
+            [ ]improve walk speed
+            [ ]encryption and decrption of file hash csv            
+            [ ]visualisation of changes
+           
 """
 
 import hashlib
