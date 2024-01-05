@@ -60,7 +60,7 @@ def main():
     #walk_dir = os.path.dirname(sys.argv[0]) #file_integrity folder
     walk_dir = os.path.splitdrive(sys.argv[0])[0] + "\\"#C drive 
     walk_dir = "c:\\"
-    hash_type = "sha512"
+    hash_type = "sha256"
     print(hash_type + " File Integrity Check of " + walk_dir)
     startwalk_time = datetime.datetime.now()
 
