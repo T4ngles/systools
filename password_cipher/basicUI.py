@@ -7,6 +7,8 @@
 
     [ ]amalgamate script files into one backend import script
     [X]create window with basic encrypt decrypt functions
+    [ ]input validation
+    [ ]incorporate permutation into ciphers
 
     Password Testing
     [ ]basic password hygiene discrete tests (NIST,ASD)
@@ -21,20 +23,49 @@
 import tkinter as tk
 from datetime import datetime
 
-DEBUG_MODE = False
-CHRLIST = [chr(i) for i in range(32,127)]
+DEBUG_MODE = True
+RESTRICT_PRINTABLE = True
+
+def debugPrint(*args):
+	if DEBUG_MODE:
+		print("#"*3+"DEBUG --> ",end="")
+		output = []
+		for arg in args:
+			output.append(arg)	
+		print(output)
+          
+
+CHRLIST_1 = [chr(i) for i in range(32,127)] #printable ascii check with strings.printable size of 95 
+CHRLIST_2 = [chr(i) for i in range(161,173)] #misc set 1
+CHRLIST_3 = [chr(i) for i in range(174,688)] #greek and accented
+CHRLIST_4 = [chr(i) for i in range(688,880)] #accents 
+CHRLIST_5 = [chr(i) for i in range(19968,40957)] #chinese
+CHRLIST_6 = [chr(i) for i in range(44032,55204)] #korean
+
+if RESTRICT_PRINTABLE:
+    CHRLIST = CHRLIST_1
+else:
+    CHRLIST = CHRLIST_1 + CHRLIST_2 + CHRLIST_3 + CHRLIST_4
+
 CHRLIST_MAP = {s:i for i, s in enumerate(CHRLIST)}
 M = len(CHRLIST)
 
-def strToIndList(raw_string):
-    return [CHRLIST_MAP[s] for s in raw_string]
+#increase entry size ciphertext and key size to size of CHRLIST M/CHRLIST_1 should be 1 if restricted to printable
+inputScaler = int(M/len(CHRLIST_1))
+
+debugPrint(f"CHRLIST is size of {M} and scaler is {inputScaler}")
+
+def strToIntList(raw_string):
+    intList = [CHRLIST_MAP[s]*inputScaler for s in raw_string]
+    debugPrint(intList)
+    return intList
 
 def _encode(raw_message, key_word):
     """ encode the message using the vignerererre cypher """
-    raw_message_int = strToIndList(raw_message)
+    raw_message_int = strToIntList(raw_message)
 
     repeats = len(raw_message) // len(key_word) + 1
-    key_word_int = strToIndList(key_word)
+    key_word_int = strToIntList(key_word)
     key_word_int = key_word_int*repeats
     key_word_int = key_word_int[:len(raw_message)] 
 
@@ -46,10 +77,10 @@ def _encode(raw_message, key_word):
 def _decode(encrypted_message, key_word):
     """ decodes the message using the vignerererre cypher """
     
-    encrypted_message_int_list = strToIndList(encrypted_message)
+    encrypted_message_int_list = strToIntList(encrypted_message)
 
     repeats = len(encrypted_message) // len(key_word) + 1
-    key_word_int = strToIndList(key_word)
+    key_word_int = strToIntList(key_word)
     key_word_int = key_word_int*repeats
     key_word_int = key_word_int[:len(encrypted_message)]
     
@@ -89,7 +120,7 @@ class userWindow:
         self.master.title("Password Cipher")
 
         self.label1 = tk.Label(self.master, text="Message").grid(row=0)
-        self.label2 = tk.Label(self.master, text="Key word").grid(row=1)
+        self.label2 = tk.Label(self.master, text="Keyword").grid(row=1)
         self.label3 = tk.Label(self.master, text="Output").grid(row=2)
         
         self.label4 = tk.Label(self.master, text="Password Tester").grid(row=4)
@@ -148,7 +179,7 @@ class userWindow:
         self.e5.delete(0, tk.END)
         self.e5.insert(0,output)
         
-        print(f"encoded {reps} times")
+        print(f"encoded {reps} times: {output}")
     
     def _decodeButton(self):    
         self.e3.delete(0, tk.END)
@@ -163,7 +194,7 @@ class userWindow:
         self.e5.delete(0, tk.END)
         self.e5.insert(0,output)
         
-        print(f"decoded {reps} times")
+        print(f"decoded {reps} times: {output}")
 
     def show_entry_fields(self):
         print(f"Message is {self.e1.get()} and Keyword is {self.e2.get()}")
