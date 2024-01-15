@@ -21,9 +21,12 @@
 """
 
 import tkinter as tk
+
+import re
+
 from datetime import datetime
 
-DEBUG_MODE = True
+DEBUG_MODE = False
 RESTRICT_PRINTABLE = True
 
 def debugPrint(*args):
@@ -111,6 +114,53 @@ def tryMakeInt(string):
     except:
         return False
 
+def checkInputLength(userInput: str):
+    return len(userInput) == 0
+
+#Password Checks
+
+    """
+        Wordlist check rockyou: Context-specific words, such as the name of the service or the individual’s username, should not be permitted.
+
+    """
+
+def checkLength(userInput: str):
+    return len(userInput) >= 8
+
+def checkRepeat(userInput: str):
+    rexRepeat = r"(\w|\W)\1+"
+    return re.findall(rexRepeat, userInput) != []
+
+def checkSequential(userInput: str):
+    userInputLength = len(userInput)
+    if userInputLength < 3:
+        return False
+    else:
+        windowLength = 3
+        positions = userInputLength - windowLength + 1
+        for x in range(positions):
+
+            convulPass = userInput[0+x:windowLength+x]
+            convulPassOrd = []
+            for y in convulPass:
+                convulPassOrd.append(y.upper())
+            if (ord(convulPassOrd[0]) + 1 == ord(convulPassOrd[1])) and (ord(convulPassOrd[1]) + 1 == ord(convulPassOrd[2])):
+                return True
+        return False
+
+def checkNumber(userInput: str):
+    rexNumber = "\d"
+    return re.findall(rexNumber, userInput) != []
+
+def checkLetter(userInput: str):
+    rexLetter = "[a-zA-Z]"
+    return re.findall(rexLetter, userInput) != []
+
+def checkSpecial(userInput: str):
+    rexSpecial = "\W"
+    return re.findall(rexSpecial, userInput) != []
+
+#Main Window
 class userWindow:
 
     def __init__(self):
@@ -167,6 +217,9 @@ class userWindow:
         self.master.mainloop()
     
     def _encodeButton(self):
+
+        #runchecks on inputs
+
         self.e3.delete(0, tk.END)
 
         message = self.e1.get()
@@ -182,6 +235,9 @@ class userWindow:
         print(f"encoded {reps} times: {output}")
     
     def _decodeButton(self):    
+
+        #runchecks on inputs
+
         self.e3.delete(0, tk.END)
 
         message = self.e1.get()
@@ -200,11 +256,32 @@ class userWindow:
         print(f"Message is {self.e1.get()} and Keyword is {self.e2.get()}")
 
     def _passwordTest(self):
+
+        #runchecks on inputs
+
+        #runchecks on passwords
+
         passwordString = self.e5.get()
-        print(passwordString)
-        self.show_entry_fields()
+        print(10*"#")
+        print("Password check of: ", passwordString)
+
+        lengthCheck = checkLength(passwordString)
+        print(f"Password Length 8 or more: {lengthCheck}")
+
+        repeatCheck = checkRepeat(passwordString)
+        print(f"Repeated Characters in Password: {repeatCheck}")
+
+        sequentialCheck = checkSequential(passwordString)
+        print(f"Sequential Characters in Password: {sequentialCheck}")
+        
+        letterCheck = checkLetter(passwordString)
+        print(f"Letters in Password: {letterCheck}")
+        
+        specialCheck = checkSpecial(passwordString)
+        print(f"Special Character in Password: {specialCheck}")
 
 #=========MAIN Function=============
+
         
 if __name__ == "__main__":
     print ('It is currently:' + str(datetime.now().time()))
