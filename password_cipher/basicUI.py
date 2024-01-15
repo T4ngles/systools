@@ -123,13 +123,20 @@ def checkInputLength(userInput: str):
         Wordlist check rockyou: Context-specific words, such as the name of the service or the individual’s username, should not be permitted.
 
     """
+def checkMark(testBool: bool):
+    assert type(testBool) == bool
+    if testBool:
+        return u'\u2713'
+    elif not testBool:
+        return u'\u2717'
+
 
 def checkLength(userInput: str):
     return len(userInput) >= 8
 
 def checkRepeat(userInput: str):
     rexRepeat = r"(\w|\W)\1+"
-    return re.findall(rexRepeat, userInput) != []
+    return re.findall(rexRepeat, userInput) == []
 
 def checkSequential(userInput: str):
     userInputLength = len(userInput)
@@ -145,8 +152,8 @@ def checkSequential(userInput: str):
             for y in convulPass:
                 convulPassOrd.append(y.upper())
             if (ord(convulPassOrd[0]) + 1 == ord(convulPassOrd[1])) and (ord(convulPassOrd[1]) + 1 == ord(convulPassOrd[2])):
-                return True
-        return False
+                return False
+        return True
 
 def checkNumber(userInput: str):
     rexNumber = "\d"
@@ -266,19 +273,19 @@ class userWindow:
         print("Password check of: ", passwordString)
 
         lengthCheck = checkLength(passwordString)
-        print(f"Password Length 8 or more: {lengthCheck}")
+        print(f"[{checkMark(lengthCheck)}] Password Length 8 or more: {lengthCheck}")
 
         repeatCheck = checkRepeat(passwordString)
-        print(f"Repeated Characters in Password: {repeatCheck}")
+        print(f"[{checkMark(repeatCheck)}] No Repeated Characters in Password: {repeatCheck}")
 
         sequentialCheck = checkSequential(passwordString)
-        print(f"Sequential Characters in Password: {sequentialCheck}")
+        print(f"[{checkMark(sequentialCheck)}] No Sequential Characters in Password: {sequentialCheck}")
         
         letterCheck = checkLetter(passwordString)
-        print(f"Letters in Password: {letterCheck}")
+        print(f"[{checkMark(letterCheck)}] Letters in Password: {letterCheck}")
         
         specialCheck = checkSpecial(passwordString)
-        print(f"Special Character in Password: {specialCheck}")
+        print(f"[{checkMark(specialCheck)}] Special Character in Password: {specialCheck}")
 
 #=========MAIN Function=============
 
