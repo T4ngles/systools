@@ -1,6 +1,6 @@
 """
     System health check
-    to add:
+    to add: (* denotes in progress)
         File Backup
         System component health check
         System Internal traffic monitor
@@ -8,15 +8,17 @@
         [X]File integrity (Start up and Shutdown scheduled check)
             [ ]include progress bar of walk through files            
             [ ]include comparison to malware hash database
-            [ ]read in most recent log for comparison
+            [ ]read in most recent log for comparison*
             [ ]append to log with summary of file changes and additions
             [ ]create a sqlite database to serve the file hashes
-            [ ]include Virus Total API for file hash inspection
+            [ ]include Virus Total API for file hash inspection*
             [ ]include CYB3RMX MalwareHashDB for file md5 hash comparison
 
             [ ]improve walk speed
             [ ]encryption and decrption of file hash csv            
             [ ]visualisation of changes
+            [ ]incorporate fuzzy hashing or context triggered piecewise hashes
+            
            
 """
 
