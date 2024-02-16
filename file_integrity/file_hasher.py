@@ -38,7 +38,7 @@ def file_hash(filepath,hash_type):
         hash_out = "MemoryError" + filepath
 
     filename = filepath.split(sep='\\')[-1]
-    print(hash_out,':',filename)
+    #print(hash_out,':',filename)
     
     return hash_out
 
