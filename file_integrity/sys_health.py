@@ -42,8 +42,10 @@ def main():
 
     if verbose:
         def vprint(*args):
+            finalArg = ""
             for arg in args:
-                print(arg)
+                finalArg = finalArg + str(arg)
+            print(finalArg)
     else:
         def vprint(*args):
             pass
