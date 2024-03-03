@@ -22,15 +22,23 @@
            
 """
 
-import hashlib
 import sys
 import os
 import file_walker
 import file_hasher
 import csv
 import datetime
-import time
 import glob
+import time
+
+PATHS_TO_IGNORE = set(
+    [r"c:\ProgramData\Sophos",
+    r"c:\AMD",
+    r"c:\ProgramData\Microsoft",
+    r"c:\Users\rlau0\Documents\Parselmouth\cyberTools\labyrinth",
+    r"c:\Users\rlau0\AppData\Local\Mozilla\Firefox\Profiles\lat5e1op.default-release"
+    ]
+    )
 
 def main():
     
@@ -107,7 +115,7 @@ def main():
     print('...hash walking the current files')
     file_hash_dict_dict = {} 
 
-    for x,filepath in enumerate(file_walker.oswalk(walk_dir,verbose = False)):
+    for x,filepath in enumerate(file_walker.oswalk(walk_dir,verbose = False, ignore_paths = PATHS_TO_IGNORE)):
         #todo: add progress bar using enumerate somehow
         progress = str(x) + (6-len(str(x)))*" " + f"/ {oldLogSize} files walked"
         percStr = str(round(x/oldLogSize*100,0))
