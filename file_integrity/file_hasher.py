@@ -19,6 +19,9 @@ def md5_hasher(filepath):
 def sha256_hasher(filepath):
     return hashlib.sha256(open(filepath,'rb').read()).hexdigest()
 
+def sha256_hasher_string(strInput):
+    return hashlib.sha256(strInput.encode('utf-8')).hexdigest()
+
 def sha512_hasher(filepath):
     return hashlib.sha512(open(filepath,'rb').read()).hexdigest()
  
@@ -60,9 +63,10 @@ def user_file_hash(hash_type):
         hash_out = "OS ERROR"
     except MemoryError:
         hash_out = "MemoryError"
-    return hash_out
 
     print(hash_type,':',hash_out)
+    
+    return hash_out
 
 def main():
 
@@ -76,6 +80,7 @@ def main():
         print(k, ":", v)
 
     hash_type = hash_choice[input("choose hash type:")]
+    print(f"using {hash_type}")
 
     user_file_hash(hash_type)
     
