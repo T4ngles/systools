@@ -208,7 +208,7 @@ def main():
         dup_files_Number = str(len(duplicate_files))
         print( dup_files_Number + " duplicate files found")
         for item in duplicate_files.values():
-            vprint("    ".join([item["filename"],item["filepath"],item["hash"],item["filesize"]]))
+            vprint("    ".join([str(x) for x in [item["filename"],item["filepath"],item["hash"],item["filesize"]]]))
         #write out duplicate hash file for inspection
         dup_files_log_name = logs_path + str(datetime.datetime.now().strftime("%d-%m-%Y %H%M%S"))+' - '+os.path.basename(walk_dir)+' - dup_files.txt'
         with open(dup_files_log_name, 'w', encoding='utf-8', newline='') as csvfile:
