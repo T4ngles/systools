@@ -35,7 +35,7 @@ PATHS_TO_IGNORE = set(
     [r"c:\ProgramData\Sophos",
     r"c:\AMD",
     r"c:\ProgramData\Microsoft",
-    r"c:\Users\rlau0\Documents\Parselmouth\cyberTools\labyrinth",
+    r"c:\Users\rlau0\Documents\Parselmouth\labyrinth",
     r"c:\Users\rlau0\AppData\Local\Mozilla\Firefox\Profiles\lat5e1op.default-release"
     ]
     )
@@ -78,6 +78,7 @@ def main():
     #walk_dir = os.path.dirname(sys.argv[0]) #file_integrity folder
     walk_dir = os.path.splitdrive(sys.argv[0])[0] + "\\"#C drive 
     walk_dir = "c:\\"
+    #walk_dir = r"c:\Users\rlau0\Documents\Parselmouth\labyrinth"
     hash_type = "sha256"
     print(hash_type + " File Integrity Check of " + walk_dir)
     startwalk_time = datetime.datetime.now()
