@@ -126,7 +126,7 @@ def main():
         progress = (3-len(percStr))*" " + percStr + "%"
 
         file_hash = file_hasher.file_hash(filepath,hash_type) #calculate hash of file        
-        filename = os.path.basename(filepath) #get filename
+        filename = os.path.basename(filepath).replace(",", " ") #get filename and replace commas with spaces
 
         filepath_hash = file_hasher.sha256_hasher_string(filepath) #calculate hash of filepath
         filename_hash = file_hasher.sha256_hasher_string(filename) #calculate hash of filename
