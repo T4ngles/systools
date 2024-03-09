@@ -77,7 +77,15 @@ def main():
 
     hash_type = hash_choice[input("choose hash type:")]
 
-    user_file_hash(hash_type)
+    input_file_hash = user_file_hash(hash_type)
+    print(input_file_hash)
+    hash_check = input("paste in hash to check")
+    print(hash_check)
+    
+    if hash_check == input_file_hash:
+        print("Check OK")
+    else:
+        print("No Match!")
     
 if __name__ == '__main__':
     main()
