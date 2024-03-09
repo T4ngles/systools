@@ -135,13 +135,13 @@ def main():
         file_key = file_hash+filepath_hash+filename_hash
         
         #check if hash is already found in walk
-        try:
-            #hash found already in walk
-            if file_hash in walked_hashes_set:
-                vprint("===hash already found===")
-                duplicate_files[file_key] = {"filename":filename,"filepath":filepath}
-            #hash not found in walk yet
-        except KeyError:
+        #hash found already in walk
+        if file_hash in walked_hashes_set:
+            vprint("===hash already found===")
+            filesize = os.path.getsize(filepath)/(1024 * 1024)
+            duplicate_files[file_key] = {"filename":filename,"filepath":filepath, "hash":file_hash, "filesize":filesize}
+        #hash not found in walk yet
+        else:
             walked_hashes_set.add(file_hash)    #add hash to hash set 
 
         #compare hash to latest log hash todo change this to hashes set.
