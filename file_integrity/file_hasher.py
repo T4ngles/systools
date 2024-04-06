@@ -16,6 +16,9 @@ def string_md5_hasher(plaintext):
 def md5_hasher(filepath):
     return hashlib.md5(open(filepath,'rb').read()).hexdigest()
 
+def md5_hasher_string(strInput):
+    return hashlib.md5(strInput.encode('utf-8')).hexdigest()
+
 def sha256_hasher(filepath):
     return hashlib.sha256(open(filepath,'rb').read()).hexdigest()
 
@@ -95,6 +98,4 @@ def main():
 if __name__ == '__main__':
     main()
     
-
-#C:\Users\rlau0\Downloads\stegano1.bmp
 

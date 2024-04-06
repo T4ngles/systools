@@ -17,8 +17,7 @@ def main():
         verbose = True
     else:
         verbose = False
-
-    ignore_paths = set([r"c:\Users\rlau0\Documents\Parselmouth\cyberTools\labyrinth"])
+    ignore_paths = ""#set([os.path.expanduser('~')+r"\Documents\Parselmouth\cyberTools\labyrinth"])
     for file in oswalk(walk_dir,verbose,ignore_paths):
         pass #to yield all files in main()
     #walk(walk_dir)
@@ -26,7 +25,7 @@ def main():
 
 def get_dir():
     print(sys.argv[0])
-    walk_dir = os.path.dirname(sys.argv[0]) #walk_dir = walk_dir[0:walk_dir.find(walk_dir.split('/')[-1])]
+    walk_dir = os.path.dirname(sys.argv[0])
     walk_dir = input("directory to walk:").replace("\"","")
     return walk_dir
 
@@ -48,9 +47,6 @@ def oswalk(walk_dir,verbose,ignore_paths):
         folders[:] = [d for d in folders if os.path.join(roots, d) not in ignore_paths]
         folder=''
         for file in files:
-            # if any(ele in os.path.split(roots)[0] for ele in ignore_paths):
-            #     vprint(f"skippping {os.path.join(roots, file)}")
-            # else:
             if folder != os.path.split(roots)[1]:
                 folder = os.path.split(roots)[1]
                 spacer = 20-len(folder)

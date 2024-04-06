@@ -31,14 +31,6 @@ import datetime
 import glob
 import time
 
-PATHS_TO_IGNORE = set(
-    [r"c:\ProgramData\Sophos",
-    r"c:\AMD",
-    r"c:\ProgramData\Microsoft",
-    r"c:\Users\rlau0\Documents\Parselmouth\labyrinth",
-    r"c:\Users\rlau0\AppData\Local\Mozilla\Firefox\Profiles\lat5e1op.default-release"
-    ]
-    )
 
 def main():
     
@@ -74,15 +66,23 @@ def main():
         spacing = [print("") for x in range(1)]
         print(20*"-")
 
-    #os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(sys.argv[0])))) #Documents folder #os.path.dirname(sys.argv[0]) #file_integrity folder
-    #walk_dir = os.path.dirname(sys.argv[0]) #file_integrity folder
     walk_dir = os.path.splitdrive(sys.argv[0])[0] + "\\"#C drive 
-    walk_dir = "c:\\"
-    #walk_dir = r"c:\Users\rlau0\Documents\Parselmouth\labyrinth"
     hash_type = "sha256"
     print(hash_type + " File Integrity Check of " + walk_dir)
+
+    ignore_path = os.path.dirname(sys.argv[0]) + "\\pathsToIgnore.txt"
+    with open(ignore_path, "r") as ignore_path_file:
+        paths_to_ignore = set([line.strip() for line in ignore_path_file.readlines()])
+    
+    print(f"ignoring paths in {paths_to_ignore}")
+
     startwalk_time = datetime.datetime.now()
 
+    #split off threads to scan multiple jobs in C drive. One per folder and one for files in C drive. output is seperate or can all append to the one(three) log file(s).
+    cDirectories = [y for y in os.listdir("C:\\") if os.path.isdir("C:\\"+y)]
+    cFiles = [y for y in os.listdir("C:\\") if os.path.isfile("C:\\"+y)]
+
+    #BREAK OFF LOG LOADING
     #Load in latest log of hashes
     #get latest log file
     logs_path = os.path.dirname(sys.argv[0]) + "\\logs\\"
@@ -109,19 +109,21 @@ def main():
         with open(latest_log, 'r', encoding='utf-8', newline='') as readcsvfile:
             reader = csv.DictReader(readcsvfile)
             for item in reader:
-                file_key = item["hash"]+file_hasher.sha256_hasher_string(item["filepath"])+file_hasher.sha256_hasher_string(item["filename"])
+                file_key = item["hash"]+file_hasher.sha256_hasher_string(item["filepath"])
                 old_hash_set.add(file_key)
                 oldLogSize = oldLogSize + 1
      
     print(f"{oldLogSize} files exist in old log")
 
+    #BREAK OFF HASHWALK TO ALLOW THREADING OF MULTIPLE JOBS
     #Main hash walk
     #walk through files and compute hashes and add to dictionary of hashes
     print('...hash walking the current files')
     file_hash_dict_dict = {} 
     walked_hashes_set = set()
+    new_files_containers = {}
 
-    for x,filepath in enumerate(file_walker.oswalk(walk_dir,verbose = False, ignore_paths = PATHS_TO_IGNORE)):
+    for x,filepath in enumerate(file_walker.oswalk(walk_dir,verbose = False, ignore_paths = paths_to_ignore)):
         #todo: add progress bar using enumerate somehow
         percStr = str(round((x+1)/oldLogSize*100,0))
         progress = (3-len(percStr))*" " + percStr + "%"
@@ -129,13 +131,17 @@ def main():
         file_hash = file_hasher.file_hash(filepath,hash_type) #calculate hash of file        
         filename = os.path.basename(filepath).replace(",", " ") #get filename and replace commas with spaces
 
+        #need to have hash of filepath? for unique key just use file_hash+filepath
+        #file ident cases:
+        #same file in multiple locations
+        #same file in same location different name
         filepath_hash = file_hasher.sha256_hasher_string(filepath) #calculate hash of filepath
-        filename_hash = file_hasher.sha256_hasher_string(filename) #calculate hash of filename
 
-        file_key = file_hash+filepath_hash+filename_hash
+        file_key = file_hash+filepath_hash
         
         #check if hash is already found in walk
         #hash found already in walk
+        #TODO: THIS CHECKS IF HASH ALREADY IN WALK BUT MISSES OUT ON FILEPATH OF INITIAL HASH FIND
         if file_hash in walked_hashes_set:
             vprint("===hash already found===")
             filesize = os.path.getsize(filepath)/(1024 * 1024)
@@ -151,6 +157,13 @@ def main():
             else:   #hash isn't in previous log so is new file or has changed
                 hashfound = False
                 new_files[file_key] = {"filename":filename,"filepath":filepath}
+                file_folder = os.path.split(filepath)[0]
+                try:
+                    if new_files_containers[file_folder]:
+                        new_files_containers[file_folder] = new_files_containers[file_folder] + 1
+                except  KeyError:
+                    new_files_containers[file_folder] = 1
+                    
 
         file_hash_dict = {"hash":file_hash,"filename":filename,"filepath":filepath,"hashfound":hashfound} #create dictionary of file hash details                         
         file_hash_dict_dict[file_key] = file_hash_dict #add file hash dictionary to upper dictionary using walk_id and file hash as the key
@@ -167,19 +180,23 @@ def main():
     
     log_name = logs_path + str(datetime.datetime.now().strftime("%d-%m-%Y %H%M%S"))+' - '+os.path.basename(walk_dir)+' - file_hash_dict.csv'     
     
+    #BREAK OFF LOG WRITING
+    #Main log
     with open(log_name, 'w', encoding='utf-8', newline='') as csvfile:
-        fieldnames = ["hash", "filename", "filepath", "hashfound"]
+        fieldnames = ["hash", "filepath"]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
 
         for file_hash in file_hash_dict_dict.values():
-            writer.writerow(file_hash)
+            filtered_row = {key: value for key, value in file_hash.items() if key in fieldnames}
+            writer.writerow(filtered_row) 
 
     endwrite_time = datetime.datetime.now()
     
     print("log file saved at " + log_name)    
     print_space()
 
+    #New files Log
     print("NEW FILES")
     if new_files:
         new_files_Number = str(len(new_files))
@@ -189,7 +206,7 @@ def main():
         #write out new hash file for inspection
         new_files_log_name = logs_path + str(datetime.datetime.now().strftime("%d-%m-%Y %H%M%S"))+' - '+os.path.basename(walk_dir)+' - new_files.txt'
         with open(new_files_log_name, 'w', encoding='utf-8', newline='') as csvfile:
-            fieldnames = ["filename", "filepath"]
+            fieldnames = ["filepath"]
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
             for file_hash in new_files.values():
@@ -197,12 +214,17 @@ def main():
                 writer.writerow(filtered_row) 
         
         print("new files hash csv log saved at ", new_files_log_name)
+        print("Summary of New files:")
+        print(f"There are {len(new_files_containers)} containers of new files")
+        for fileContainer in sorted(new_files_containers.items(), key=lambda x: x[1]):
+            print(fileContainer) #tuple of filepath and number of files. Add a sum of filesize as well?
         print_space()
         
     else:
         print("no new files or modifications found")
         new_files_Number = 0
     
+    #Duplicate File Log
     print("DUPLICATE FILES")
     if duplicate_files:
         dup_files_Number = str(len(duplicate_files))
@@ -210,16 +232,16 @@ def main():
         for item in duplicate_files.values():
             vprint("    ".join([str(x) for x in [item["filename"],item["filepath"],item["hash"],item["filesize"]]]))
         #write out duplicate hash file for inspection
-        dup_files_log_name = logs_path + str(datetime.datetime.now().strftime("%d-%m-%Y %H%M%S"))+' - '+os.path.basename(walk_dir)+' - dup_files.txt'
-        with open(dup_files_log_name, 'w', encoding='utf-8', newline='') as csvfile:
-            fieldnames = ["filename", "filepath","hash","filesize"]
-            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-            writer.writeheader()
-            for file_hash in duplicate_files.values():
-                filtered_row = {key: value for key, value in file_hash.items() if key in fieldnames}
-                writer.writerow(filtered_row) 
+        # dup_files_log_name = logs_path + str(datetime.datetime.now().strftime("%d-%m-%Y %H%M%S"))+' - '+os.path.basename(walk_dir)+' - dup_files.txt'
+        # with open(dup_files_log_name, 'w', encoding='utf-8', newline='') as csvfile:
+        #     fieldnames = ["filepath","hash","filesize"]
+        #     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        #     writer.writeheader()
+        #     for file_hash in duplicate_files.values():
+        #         filtered_row = {key: value for key, value in file_hash.items() if key in fieldnames}
+        #         writer.writerow(filtered_row) 
         
-        print("dupilcate files hash csv log saved at ", dup_files_log_name)
+        # print("dupilcate files hash csv log saved at ", dup_files_log_name)
         print_space()
 
     else:
@@ -228,13 +250,8 @@ def main():
     
     print_space()
 
-    print(f"file walk of {str(len(file_hash_dict_dict))} files ({new_files_Number} new) took {str((endwalk_time-startwalk_time).total_seconds())} seconds")
-    print("log comparison and write took " + str((endwrite_time-endwalk_time).total_seconds()) + " seconds")
-
-    print_space()
-
-
-    
+    print(f"file walk of {str(len(file_hash_dict_dict))} files ({new_files_Number} new) took {((endwalk_time-startwalk_time).total_seconds()/60):.2f} minutes")
+    print(f"log comparison and write took {((endwrite_time-endwalk_time).total_seconds()/60):.2f} minutes")
 
             
 if __name__ == '__main__':
