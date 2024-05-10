@@ -44,7 +44,7 @@ def oswalk(walk_dir,verbose,ignore_paths):
     walkedfiles = []
 
     for roots, folders, files in os.walk(walk_dir):
-        folders[:] = [d for d in folders if os.path.join(roots, d) not in ignore_paths]
+        folders[:] = [d for d in folders if (os.path.join(roots, d) not in ignore_paths) and (os.path.islink(os.path.join(roots, d)) == False) and (os.path.isjunction(os.path.join(roots, d)) == False) ]
         folder=''
         for file in files:
             if folder != os.path.split(roots)[1]:
